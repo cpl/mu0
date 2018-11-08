@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 
 static uint16_t bin_data[0xFFFF] = {0,};
@@ -24,19 +25,34 @@ int main() {
     // Close file
     fclose(file);
 
+
+    bool parsing = false;
+    char* start; int len;
+
     while(*file_data) {
+        // Skip comment lines
         if(*file_data == ';')
             while(*file_data && *file_data != '\n')
                 file_data++;
 
-        int _parsing = 0;
-        while(*file_data && !isspace(*file_data) && *file_data != ';') {
-            printf("%c", *file_data);
-            file_data++;
-            _parsing = 1;
-        }
-        if(_parsing) {
-            printf("\n");
+        if(!isspace(*file_data)) {
+            if(!parsing) {
+                parsing = true;
+                start = file_data;
+                len = 0;
+            }
+            len++;
+        } else {
+            if(parsing) {
+                parsing = false;
+                if(len != 3) {
+                    printf("label: ");
+                }
+                while(len-- > 0) {
+                    printf("%c", *start++);
+                }
+                printf("\n");
+            }
         }
 
         file_data++;
