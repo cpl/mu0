@@ -20,7 +20,7 @@
 
 init	ORG	0000		;// RESET MEMORY ADRESS
 
-			JMP	mrst		;// RESET BOARD COMPONENTS
+			JMP	mrst ;// RESET BOARD COMPONENTS
 
 runt							;// START PROGRAM RUNTIME
 
@@ -306,7 +306,7 @@ mcemp							;// CHECK FOR EMPTY SCREEN
 			LDA dff			;// CHECK DIFFICULTY X
 			SUB dfx			;// CHECK IF X
 			JNE ndx			;// NOT X
-			JMP sequence;// DIF X
+			JMP sequence ;// DIF X
 
 ndx		LDA dff			;// CHECK DIFFICULTY 3
 			SUB df3
@@ -359,7 +359,7 @@ mhit								;// PLAYER GOT HIT
 
 			LDA ph3
 			SUB php
-			JNE	alv1
+			JNE alv1
 			LDA ph2
 			STA php
 			STA dbg

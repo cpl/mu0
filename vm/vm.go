@@ -1,78 +1,86 @@
-package main
+package vm
 
 import (
 	"fmt"
+	"log"
 )
 
+// A word is 2 byte long on the MU0
 type word uint16
 
+// Number of bits in a word
+const wordSizeB = 16
+
+// Operation Code defined constants
 const (
-	opcSize  word = 4
-	opcShift word = 12
-	opcMask  word = ((1 << opcSize) - 1) << opcShift
+	opcSizeB word = 4                                 // OP code is 4 bits
+	opcShift word = 12                                // OP code is bits 12:15
+	opcMask  word = ((1 << opcSizeB) - 1) << opcShift // OP code mask 11110...
+)
+
+// Remaining bits are used as "arguments" for the OP
+const (
+	argSize word = wordSizeB - opcSizeB //
+	argMask word = (1 << argSize) - 1   //
 )
 
 const (
-	argSize word = 12
-	argMask word = (1 << argSize) - 1
+	opLDA word = ((0 << opcShift) & opcMask) // LDA s
+	opSTA word = ((1 << opcShift) & opcMask) // STA s
+	opADD word = ((2 << opcShift) & opcMask) // ADD s
+	opSUB word = ((3 << opcShift) & opcMask) // SUB s
+	opJMP word = ((4 << opcShift) & opcMask) // JMP s
+	opJGE word = ((5 << opcShift) & opcMask) // JGE s
+	opJNE word = ((6 << opcShift) & opcMask) // JNE s
+	opSTP word = ((7 << opcShift) & opcMask) // STP
 )
 
-const (
-	opLDA word = ((0 << opcShift) & opcMask)
-	opSTA word = ((1 << opcShift) & opcMask)
-	opADD word = ((2 << opcShift) & opcMask)
-	opSUB word = ((3 << opcShift) & opcMask)
-	opJMP word = ((4 << opcShift) & opcMask)
-	opJGE word = ((5 << opcShift) & opcMask)
-	opJNE word = ((6 << opcShift) & opcMask)
-	opSTP word = ((7 << opcShift) & opcMask)
-)
-
-// VM ...
+// VM attempts to simulate the components found on the UoM MU0 boards
 type VM struct {
-	running bool
+	running bool // State of the VM
 
-	ACC    word
-	PC     word
-	Memory [0xFFFF]word
+	ACC    word         // Accumulator (main register)
+	PC     word         // Program Counter
+	Memory [0xFFFF]word // Physical memory space
 }
 
-// NewVM ...
-func NewVM() *VM {
-	return &VM{
+// New create a virtual machine
+func New() VM {
+	return VM{
 		ACC:    0,
 		PC:     0,
 		Memory: [0xFFFF]word{0},
 	}
 }
 
-// Load ...
+// Load a compiled program into memory
 func (vm *VM) Load(data []byte) {
 	for index := 0; index+2 < len(data) && index/2 < cap(vm.Memory); index += 2 {
 		vm.Memory[index/2] = word(data[index])<<8 | word(data[index+1])
 	}
 }
 
-// Stop ...
+// Stop VM execution
 func (vm *VM) Stop() {
 	vm.running = false
 }
 
-// Run ...
+// Run starts OP execution from the ORIG address
 func (vm *VM) Run() {
 	vm.running = true
 
-	var instruction word
-	var opc word
-	var arg word
+	var instruction word // Current instruction
+	var opc word         // Operation code
+	var arg word         // Operation arg
 
 	for vm.running {
-		instruction = vm.Memory[vm.PC]
-		opc = instruction & opcMask
-		arg = instruction & argMask
+		instruction = vm.Memory[vm.PC] // Load instruction from memory (PC)
+		opc = instruction & opcMask    // Extract operation code
+		arg = instruction & argMask    // Extract operation arg
 
-		vm.PC++
+		vm.PC++ // Increment PC
 
+		// Check which instruction to execute and how
 		switch opc {
 		case opLDA:
 			vm.ACC = vm.Memory[arg]
@@ -103,12 +111,12 @@ func (vm *VM) Run() {
 			vm.Stop()
 			break
 		default:
-			fmt.Printf("%04x %04x\n", opc, arg)
+			log.Fatalf("%04x %04x\n", opc, arg)
 		}
 	}
 }
 
-// MemoryDump ...
+// MemoryDump writes the memory contents to stdout
 func (vm *VM) MemoryDump() {
 	for index := 0; index+8 < cap(vm.Memory); index += 8 {
 		fmt.Printf(
