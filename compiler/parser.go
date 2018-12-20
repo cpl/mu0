@@ -1,6 +1,12 @@
 package compiler
 
-import "log"
+import (
+	"fmt"
+	"log"
+	"strings"
+
+	"github.com/thee-engineer/mu0-vm/mu0"
+)
 
 func eatComment(idx *int, stream []byte) {
 	for stream[*idx] != '\n' && *idx < (len(stream)-1) {
@@ -46,4 +52,54 @@ func eatTokenPart(idx *int, stream []byte) string {
 	}
 
 	return str
+}
+
+func parseArg(tkn *token, tree []*token) mu0.Word {
+	// Labels and constants
+	if addr, ok := labels[tkn.arg]; ok {
+		// Expand labels to constants
+		if tree[addr].t == tokenTypeEQU {
+			return valueToWord(tree[addr].arg)
+		}
+
+		// Expand labels to addresses
+		return mu0.Word(addr * 2)
+	}
+
+	// Parse values
+	return valueToWord(tkn.arg)
+}
+
+func valueToWord(val string) mu0.Word {
+	var valInt int
+
+	if strings.HasPrefix(val, "0B") {
+		// Parse binary
+		_, err := fmt.Sscanf(val, "0B%b", &valInt)
+		if err != nil {
+			log.Fatalln("failed to parse value", val)
+		}
+		return mu0.Word(valInt)
+	} else if strings.HasPrefix(val, "&") {
+		// Parse hex
+		_, err := fmt.Sscanf(val, "&%X", &valInt)
+		if err != nil {
+			log.Fatalln("failed to parse value", val)
+		}
+		return mu0.Word(valInt)
+	} else if strings.HasPrefix(val, "0X") {
+		// Parse hex alternative
+		_, err := fmt.Sscanf(val, "0X%X", &valInt)
+		if err != nil {
+			log.Fatalln("failed to parse value", val)
+		}
+		return mu0.Word(valInt)
+	}
+
+	// Parse decimal
+	_, err := fmt.Sscanf(val, "%d", &valInt)
+	if err != nil {
+		log.Fatalln("failed to parse value", val)
+	}
+	return mu0.Word(valInt)
 }

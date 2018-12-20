@@ -1,38 +1,80 @@
 package compiler
 
 import (
-	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/thee-engineer/mu0-vm/mu0"
 )
 
 // Compile ...
-func Compile(filePath string) {
-	tree := lex(filePath)
+func Compile(inFile, outFile string) []mu0.Word {
+	log.Printf("Compile: %s -> %s\n", inFile, outFile)
+	t := time.Now()
 
-	for idx, tkn := range tree {
+	// Lexical analysis of source code
+	tree := lex(inFile)
 
-		// Treat defines as single word
-		if tkn.t == tokenTypeDEF {
-			fmt.Println(idx, "DEF")
+	// Compiled binary for MU0
+	var binary []mu0.Word
+	var instruction mu0.Word
+
+	// Iterate lexical tree
+	for _, tkn := range tree {
+		// Skip EQU
+		if tkn.t == tokenTypeEQU {
 			continue
 		}
 
-		fmt.Printf("%4d %4d %4d\n", idx, tkn.t, parseArg(tkn, tree))
-	}
-}
+		// If define, create word, else parse token
+		if tkn.t == tokenTypeDEF {
+			// If link to label, else word define
+			if addr, ok := labels[tkn.arg]; ok {
+				instruction = mu0.Word(addr)
+			} else {
+				instruction = parseArg(tkn, tree)
+			}
+		} else {
+			// Extract instruction op code
+			instruction = tokenTypeToOPC[tkn.t]
 
-func parseArg(tkn *token, tree []*token) int {
-
-	// Labels and constants
-	if addr, ok := labels[tkn.arg]; ok {
-		// Expand labels to constants
-		if tree[addr].t == tokenTypeEQU {
-			return -10 // TODO, parse tree[addr].arg as value
+			// Extract instruction argument
+			instruction |= parseArg(tkn, tree)
 		}
 
-		// Expand labels to addresses
-		return addr
+		binary = append(binary, instruction)
 	}
 
-	// Parse values
-	return -3 // TODO, parse tkn.arg as value
+	// Create output file
+	f, err := os.Create(outFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+
+	// Create byte array
+	byteStream := make([]byte, len(binary)*2)
+
+	// Move binary words to byte array
+	for idx, w := range binary {
+		// fmt.Println(decompileInstruction(w))
+
+		byteStream[idx*2] = byte(w >> 8)
+		byteStream[idx*2+1] = byte(w & 0x00FF)
+	}
+
+	// Write binary data to file
+	_, err = f.Write(byteStream)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Log details
+	log.Printf("Compile: finished OK, in %d ns\n",
+		time.Now().Nanosecond()-t.Nanosecond())
+	log.Printf("Compile: wrote %d bytes to %s\n", len(byteStream), outFile)
+
+	// Return binary as word array
+	return binary
 }

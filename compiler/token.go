@@ -2,6 +2,8 @@ package compiler
 
 import (
 	"log"
+
+	"github.com/thee-engineer/mu0-vm/mu0"
 )
 
 type token struct {
@@ -10,6 +12,19 @@ type token struct {
 }
 
 type tokenType int
+
+var tokenTypeToOPC = map[tokenType]mu0.Word{
+	tokenTypeLDA: mu0.OpLDA,
+	tokenTypeSTA: mu0.OpSTA,
+	tokenTypeADD: mu0.OpADD,
+	tokenTypeSUB: mu0.OpSUB,
+	tokenTypeJMP: mu0.OpJMP,
+	tokenTypeJGE: mu0.OpJGE,
+	tokenTypeJNE: mu0.OpJNE,
+	tokenTypeBRK: mu0.OpBRK,
+	tokenTypeSLP: mu0.OpSLP,
+	tokenTypeSTP: mu0.OpSTP,
+}
 
 const (
 	_tokenTypeInstruction tokenType = 10
@@ -22,9 +37,8 @@ const (
 	tokenTypeJNE          tokenType = 17
 
 	_tokenTypeCDirective tokenType = 100
-	tokenTypeORG         tokenType = 101
-	tokenTypeEQU         tokenType = 102
-	tokenTypeDEF         tokenType = 103
+	tokenTypeEQU         tokenType = 101
+	tokenTypeDEF         tokenType = 102
 
 	_tokenTypeVMDirective tokenType = 1000
 	tokenTypeBRK          tokenType = 1001
@@ -34,18 +48,20 @@ const (
 
 var tokenTypeMap = map[string]tokenType{
 	// Instructions
-	"LDA": tokenTypeLDA,
-	"STA": tokenTypeSTA,
-	"ADD": tokenTypeADD,
-	"SUB": tokenTypeSUB,
-	"JMP": tokenTypeJMP,
-	"JGE": tokenTypeJGE,
-	"JNE": tokenTypeJNE,
-	"STP": tokenTypeSTP,
+	"LDA":  tokenTypeLDA,
+	"STA":  tokenTypeSTA,
+	"ADD":  tokenTypeADD,
+	"SUB":  tokenTypeSUB,
+	"JMP":  tokenTypeJMP,
+	"B":    tokenTypeJMP,
+	"JGE":  tokenTypeJGE,
+	"BGE":  tokenTypeJGE,
+	"JNE":  tokenTypeJNE,
+	"BNE":  tokenTypeJNE,
+	"STP":  tokenTypeSTP,
+	"STOP": tokenTypeSTP,
 
 	// Compiler directives
-	"ORG":   tokenTypeORG,
-	"ORIG":  tokenTypeORG,
 	"EQU":   tokenTypeEQU,
 	"CONST": tokenTypeEQU,
 	"DEF":   tokenTypeDEF,
@@ -69,7 +85,6 @@ func newToken(parts []string) *token {
 
 	// Create new token
 	tkn := new(token)
-	log.Println(parts)
 
 	// If token is a label
 	if _, ok := tokenTypeMap[parts[0]]; !ok {
@@ -82,16 +97,21 @@ func newToken(parts []string) *token {
 		}
 
 		// Label has token attached
-		tkn.t = tokenTypeMap[parts[1]]
-		if tkn.t != tokenTypeSTP {
-			tkn.arg = parts[2]
+		tkn.t, ok = tokenTypeMap[parts[1]]
+		if !ok {
+			log.Fatalf("new token: unexpected instructions, %s at line %d\n",
+				parts[1], _line)
 		}
+		tkn.arg = parts[2]
 	} else {
+		if len(parts) != 2 {
+			log.Fatalf("new token: not enough parts %s at line %d\n",
+				parts, _line)
+		}
+
 		// Normal token
 		tkn.t = tokenTypeMap[parts[0]]
-		if tkn.t != tokenTypeSTP {
-			tkn.arg = parts[1]
-		}
+		tkn.arg = parts[1]
 	}
 
 	address++

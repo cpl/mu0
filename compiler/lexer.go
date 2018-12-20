@@ -21,10 +21,13 @@ func lex(filePath string) (tokenList []*token) {
 		panic(err)
 	}
 
+	log.Printf("Lex: scanning %d runes\n", len(stream))
+
 	// Iterate file contents
 	partCount := 0
 	partsList := make([]string, 3)
-	for idx := 0; idx < len(stream); {
+	for idx := 0; idx < len(stream)-1; {
+
 		// Parse comments
 		if stream[idx] == ';' {
 			eatComment(&idx, stream)
@@ -58,6 +61,11 @@ func lex(filePath string) (tokenList []*token) {
 
 		// Skip
 		idx++
+	}
+
+	nt := newToken(partsList[:partCount])
+	if nt != nil {
+		tokenList = append(tokenList, nt)
 	}
 
 	log.Printf("Lex: finished OK, parsed %d lines in %d ns\n", _line,
