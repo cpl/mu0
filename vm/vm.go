@@ -54,8 +54,8 @@ func New() VM {
 }
 
 // Load a compiled program into memory
-func (vm *VM) Load(data []byte) {
-	for index := 0; index+2 < len(data) && index/2 < cap(vm.Memory); index += 2 {
+func (vm *VM) Load(data []byte, start int) {
+	for index := start; index+2 < len(data) && index/2 < cap(vm.Memory); index += 2 {
 		vm.Memory[index/2] = word(data[index])<<8 | word(data[index+1])
 	}
 }

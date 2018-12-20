@@ -7,64 +7,11 @@ import (
 )
 
 var _line = 0
+var labels = make(map[string]int)
+var address = 0
 
-type token struct {
-	t tokenType
-}
-
-type tokenType int
-
-const (
-	_tokenTypeInstruction tokenType = 10
-	tokenTypeLDA          tokenType = 11
-	tokenTypeSTA          tokenType = 12
-	tokenTypeADD          tokenType = 13
-	tokenTypeSUB          tokenType = 14
-	tokenTypeJMP          tokenType = 15
-	tokenTypeJGE          tokenType = 16
-	tokenTypeJNE          tokenType = 17
-	tokenTypeSTP          tokenType = 18
-
-	_tokenTypeCDirective tokenType = 100
-	tokenTypeORG         tokenType = 101
-	tokenTypeEQU         tokenType = 102
-	tokenTypeDEF         tokenType = 103
-
-	_tokenTypeVMDirective tokenType = 1000
-	tokenTypeBRK          tokenType = 1001
-	tokenTypeSLP          tokenType = 1002
-)
-
-var labels map[string]int
-
-var tokenTypeMap = map[string]tokenType{
-	// Instructions
-	"LDA": tokenTypeLDA,
-	"STA": tokenTypeSTA,
-	"ADD": tokenTypeADD,
-	"SUB": tokenTypeSUB,
-	"JMP": tokenTypeJMP,
-	"JGE": tokenTypeJGE,
-	"JNE": tokenTypeJNE,
-	"STP": tokenTypeSTP,
-
-	// Compiler directives
-	"ORG":   tokenTypeORG,
-	"ORIG":  tokenTypeORG,
-	"EQU":   tokenTypeEQU,
-	"CONST": tokenTypeEQU,
-	"DEF":   tokenTypeDEF,
-	"DEFW":  tokenTypeDEF,
-
-	// VM directives
-	"BRK":   tokenTypeBRK,
-	"BREAK": tokenTypeBRK,
-	"SLP":   tokenTypeSLP,
-	"SLEEP": tokenTypeSLP,
-}
-
-// Lex opens a source file for reading and creates the token tree
-func Lex(filePath string) {
+// lex opens a source file for reading and creates the token tree
+func lex(filePath string) (tokenList []*token) {
 	log.Println("Lex:", filePath)
 	t := time.Now()
 
@@ -76,8 +23,8 @@ func Lex(filePath string) {
 
 	// Iterate file contents
 	partCount := 0
+	partsList := make([]string, 3)
 	for idx := 0; idx < len(stream); {
-
 		// Parse comments
 		if stream[idx] == ';' {
 			eatComment(&idx, stream)
@@ -86,9 +33,17 @@ func Lex(filePath string) {
 
 		// Parse spaces
 		if isSpace(stream[idx]) {
+			// On newline, parse token parts
 			if eatSpaces(&idx, stream) {
+
+				// Append new token if not nil
+				nt := newToken(partsList[:partCount])
+				if nt != nil {
+					tokenList = append(tokenList, nt)
+				}
+
+				// Reset part counter
 				partCount = 0
-				print("\n")
 			}
 			continue
 		}
@@ -96,17 +51,7 @@ func Lex(filePath string) {
 		// Parse tokens
 		if isTokenChar(stream[idx]) {
 			str := eatTokenPart(&idx, stream)
-			if tokenTypeMap[str] == 0 {
-				if partCount == 0 {
-					print("lbl:", str)
-				} else {
-					print("arg:", str)
-				}
-			} else {
-				print("tkn:", str)
-			}
-			print(" ")
-
+			partsList[partCount] = str
 			partCount++
 			continue
 		}
@@ -117,4 +62,8 @@ func Lex(filePath string) {
 
 	log.Printf("Lex: finished OK, parsed %d lines in %d ns\n", _line,
 		(time.Now().Nanosecond() - t.Nanosecond()))
+	log.Printf("Lex: generated %d tokens, using %d bytes\n", len(tokenList), address*2)
+	log.Printf("Lex: generated %d labels\n", len(labels))
+
+	return tokenList
 }
