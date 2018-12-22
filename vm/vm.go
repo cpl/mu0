@@ -12,17 +12,19 @@ import (
 type VM struct {
 	running bool // State of the VM
 
-	ACC    mu0.Word         // Accumulator (main register)
-	PC     mu0.Word         // Program Counter
-	Memory [0xFFFF]mu0.Word // Physical memory space
+	ACC      mu0.Word         // Accumulator (main register)
+	PC       mu0.Word         // Program Counter
+	Memory   [0xFFFF]mu0.Word // Physical memory space
+	StopCode mu0.Word         // Exit code / Stop code
 }
 
 // New create a virtual machine
 func New() VM {
 	return VM{
-		ACC:    0,
-		PC:     0,
-		Memory: [0xFFFF]mu0.Word{},
+		ACC:      0,
+		PC:       0,
+		Memory:   [0xFFFF]mu0.Word{},
+		StopCode: 0,
 	}
 }
 
@@ -44,7 +46,8 @@ func (vm *VM) LoadFile(filePath string) {
 }
 
 // Stop VM execution
-func (vm *VM) Stop() {
+func (vm *VM) Stop(code mu0.Word) {
+	vm.StopCode = code
 	vm.running = false
 }
 
@@ -60,7 +63,7 @@ func (vm *VM) Run() {
 		// Check PC in memory range
 		if int(vm.PC) > len(vm.Memory)-1 {
 			log.Println("VM: PC out of memory address space")
-			vm.Stop()
+			vm.Stop(400)
 			return
 		}
 
@@ -98,7 +101,7 @@ func (vm *VM) Run() {
 			}
 			break
 		case mu0.OpSTP:
-			vm.Stop()
+			vm.Stop(arg)
 			break
 		default:
 			log.Fatalf("%04x %04x\n", opc, arg)

@@ -13,5 +13,5 @@ func main() {
 	myVM.LoadFile("./source.out")
 	myVM.Run()
 
-	log.Println("ACC", myVM.ACC, "PC", myVM.PC)
+	log.Println("ACC", myVM.ACC, "PC", myVM.PC, "SC", myVM.StopCode)
 }

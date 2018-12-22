@@ -58,7 +58,8 @@ func Compile(inFile, outFile string) []mu0.Word {
 
 	// Move binary words to byte array
 	for idx, w := range binary {
-		// fmt.Println(decompileInstruction(w))
+		// ! DEBUG
+		// fmt.Printf("%X %s\n", idx, decompileInstruction(w))
 
 		byteStream[idx*2] = byte(w >> 8)
 		byteStream[idx*2+1] = byte(w & 0x00FF)

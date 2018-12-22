@@ -63,7 +63,7 @@ func parseArg(tkn *token, tree []*token) mu0.Word {
 		}
 
 		// Expand labels to addresses
-		return mu0.Word(addr * 2)
+		return mu0.Word(addr)
 	}
 
 	// Parse values
