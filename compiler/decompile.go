@@ -3,7 +3,7 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/thee-engineer/mu0-vm/mu0"
+	"github.com/thee-engineer/mu0/mu0"
 )
 
 func decompileInstruction(w mu0.Word) string {

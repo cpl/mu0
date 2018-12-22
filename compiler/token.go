@@ -3,7 +3,7 @@ package compiler
 import (
 	"log"
 
-	"github.com/thee-engineer/mu0-vm/mu0"
+	"github.com/thee-engineer/mu0/mu0"
 )
 
 type token struct {

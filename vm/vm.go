@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/thee-engineer/mu0-vm/mu0"
+	"github.com/thee-engineer/mu0/mu0"
 )
 
 // VM attempts to simulate the components found on the UoM MU0 boards
