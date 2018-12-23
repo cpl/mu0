@@ -1,11 +1,37 @@
+/*
+MIT License
+
+Copyright (c) 2018-2019 Alexandru-Paul Copil
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package vm
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"time"
 
+	"github.com/thee-engineer/mu0/module"
 	"github.com/thee-engineer/mu0/mu0"
 )
 
@@ -19,11 +45,30 @@ type VM struct {
 	PC       mu0.Word         // Program Counter
 	Memory   [0xFFFF]mu0.Word // Physical memory space
 	StopCode mu0.Word         // Exit code / Stop code
+
+	modules []module.Module // List of peripheral devices
 }
 
 // New create a virtual machine
 func New() *VM {
 	return new(VM)
+}
+
+// HandleModules starts a new thread that manages all external devices (modules)
+func (v *VM) HandleModules() {
+	// Background task
+	for {
+		// Iterate modules
+		for _, mod := range v.modules {
+			// Skip busy modules
+			if mod.IsBusy() {
+				continue
+			}
+
+			//Handle module on a new thread
+			go mod.Handle(&v.Memory)
+		}
+	}
 }
 
 // Load a compiled program into memory
@@ -49,6 +94,20 @@ func (v *VM) Stop(code mu0.Word) {
 	v.isRunning = false
 }
 
+// AddModule appends a module to the VM, only if it's NOT running
+func (v *VM) AddModule(m module.Module) error {
+	// Don't append module when running
+	if v.isRunning {
+		return errors.New("VM already running, can't add module")
+	}
+
+	// Append module
+	v.modules = append(v.modules, m)
+
+	// No error
+	return nil
+}
+
 // Run starts OP execution from the ORIG address
 func (v *VM) Run() {
 	v.isRunning = true
@@ -56,6 +115,9 @@ func (v *VM) Run() {
 	var instruction mu0.Word // Current instruction
 	var opc mu0.Word         // Operation code
 	var arg mu0.Word         // Operation arg
+
+	// Start module handler thread
+	go v.HandleModules()
 
 	for v.isRunning {
 		// Check PC in memory range
@@ -120,9 +182,14 @@ func (v *VM) Run() {
 	}
 }
 
-// MemoryDump writes the memory contents to stdout
-func (v *VM) MemoryDump() {
-	for index := 0; index+8 < cap(v.Memory); index += 8 {
+// MemoryDump writes the memory contents to stdout. It takes the max address
+// to print until, if <= 0, set to max address space.
+func (v *VM) MemoryDump(to int) {
+	if to <= 0 {
+		to = cap(v.Memory)
+	}
+
+	for index := 0; index+8 < to; index += 8 {
 		fmt.Printf(
 			"%04x : %04x %04x %04x %04x %04x %04x %04x %04x\n", index,
 			v.Memory[index],

@@ -22,50 +22,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package main
+package module
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/thee-engineer/mu0/compiler"
-	"github.com/thee-engineer/mu0/module"
 	"github.com/thee-engineer/mu0/mu0"
-	"github.com/thee-engineer/mu0/vm"
 )
 
-const usage = "mu0 <run <source.o> | build <source.s> [source.o]>"
+// Module contains the functions needed for the VM to exec/handle external dev
+type Module interface {
+	Handle(mm *[0xFFFF]mu0.Word)
+	IsBusy() bool
+}
 
-func main() {
-	if len(os.Args) < 3 {
-		fmt.Println(usage)
-		os.Exit(1)
-	}
+type module struct {
+	locked          bool       // Busy status
+	deviceRegisters []mu0.Word // Ports in memory
+}
 
-	switch os.Args[1] {
-	case "build":
-		if len(os.Args) == 4 {
-			compiler.Compile(os.Args[2], os.Args[3])
-		}
-
-		compiler.Compile(os.Args[2], os.Args[2]+".o")
-
-		os.Exit(0)
-	case "run":
-		_vm := vm.New()
-
-		// ! DEBUG
-		_vm.AddModule(module.NewDummy([]mu0.Word{0x100, 0x102, 0x104}))
-
-		_vm.LoadFile(os.Args[2])
-		_vm.Run()
-
-		fmt.Println("ACC", _vm.ACC, "PC", _vm.PC, "EXIT CODE", _vm.StopCode)
-		_vm.MemoryDump(0x200)
-
-		os.Exit(0)
-	default:
-		fmt.Println(usage)
-		os.Exit(1)
-	}
+func (m module) IsBusy() bool {
+	return m.locked
 }

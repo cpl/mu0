@@ -60,10 +60,12 @@ The boards provided by the University of Manchester (which inspired me to make t
 
 ## TODO
 
-- [ ] Add optional SP, LR to the MU0 VM (with instruction set)
-- [ ] Add register operations to the compiler
-- [ ] Implement BRK, SLP operations
-- [ ] Implement peripherals for the VM (keypad, LCD display)
+- [ ] Add SP, LR to the MU0 VM (with instruction set) (with run/compile flag optional)
+- [ ] Add register operations to the compiler (with run/compile flag optional)
+- [x] Implement SLP operation
+- [ ] Implement BRK operation
+- [x] Implement module interface and handler
+- [ ] Implement peripherals for the VM (keypad, LCD display, etc.)
 - [ ] Implement INCLUDE compiler directive
 - [ ] Implement interactive VM mode
 - [ ] Implement flags for compiler and VM
