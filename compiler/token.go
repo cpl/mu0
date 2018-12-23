@@ -39,6 +39,7 @@ const (
 	_tokenTypeCDirective tokenType = 100
 	tokenTypeEQU         tokenType = 101
 	tokenTypeDEF         tokenType = 102
+	tokenTypeINC         tokenType = 103
 
 	_tokenTypeVMDirective tokenType = 1000
 	tokenTypeBRK          tokenType = 1001
@@ -62,10 +63,12 @@ var tokenTypeMap = map[string]tokenType{
 	"STOP": tokenTypeSTP,
 
 	// Compiler directives
-	"EQU":   tokenTypeEQU,
-	"CONST": tokenTypeEQU,
-	"DEF":   tokenTypeDEF,
-	"DEFW":  tokenTypeDEF,
+	"DEF":     tokenTypeDEF,
+	"DEFW":    tokenTypeDEF,
+	"EQU":     tokenTypeEQU,
+	"CONST":   tokenTypeEQU,
+	"INCLUDE": tokenTypeINC,
+	"INC":     tokenTypeINC,
 
 	// VM directives
 	"BRK":   tokenTypeBRK,

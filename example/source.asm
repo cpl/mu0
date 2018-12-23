@@ -1,5 +1,7 @@
 start	LDA	nil
 
+	SLP	3000
+
 	ADD	one
 	ADD	one
 	ADD	two

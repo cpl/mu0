@@ -49,7 +49,7 @@ has extra instructions and compiler directives defined, and some aliases for ARM
 | 0110 | JNE       | JNE S    | Set the `PC` to the value of `S` if `ACC != 0`            |
 | 0111 | STP       | STP S    | Stop the program from running. `S` will be the exit code  |
 | 1000 | BRK       | BRK      | Pause the program execution, action must be taken         |
-| 1001 | SLP       | SLP S    | VM level implementation of `sleep` to avoid idle-spin     |
+| 1001 | SLP       | SLP S    | VM level implementation of `sleep` to avoid idle-spin, sleep S ms     |
 
 ### University of Manchester
 
