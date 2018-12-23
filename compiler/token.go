@@ -3,7 +3,7 @@ package compiler
 import (
 	"log"
 
-	"github.com/thee-engineer/mu0/mu0"
+	"github.com/thee-engineer/mu0/builtin"
 )
 
 type token struct {
@@ -13,17 +13,17 @@ type token struct {
 
 type tokenType int
 
-var tokenTypeToOPC = map[tokenType]mu0.Word{
-	tokenTypeLDA: mu0.OpLDA,
-	tokenTypeSTA: mu0.OpSTA,
-	tokenTypeADD: mu0.OpADD,
-	tokenTypeSUB: mu0.OpSUB,
-	tokenTypeJMP: mu0.OpJMP,
-	tokenTypeJGE: mu0.OpJGE,
-	tokenTypeJNE: mu0.OpJNE,
-	tokenTypeBRK: mu0.OpBRK,
-	tokenTypeSLP: mu0.OpSLP,
-	tokenTypeSTP: mu0.OpSTP,
+var tokenTypeToOPC = map[tokenType]builtin.Word{
+	tokenTypeLDA: builtin.OpLDA,
+	tokenTypeSTA: builtin.OpSTA,
+	tokenTypeADD: builtin.OpADD,
+	tokenTypeSUB: builtin.OpSUB,
+	tokenTypeJMP: builtin.OpJMP,
+	tokenTypeJGE: builtin.OpJGE,
+	tokenTypeJNE: builtin.OpJNE,
+	tokenTypeBRK: builtin.OpBRK,
+	tokenTypeSLP: builtin.OpSLP,
+	tokenTypeSTP: builtin.OpSTP,
 }
 
 const (

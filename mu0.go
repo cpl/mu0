@@ -60,7 +60,12 @@ func main() {
 		_vm.LoadFile(os.Args[2])
 		_vm.Run()
 
-		fmt.Println("ACC", _vm.ACC, "PC", _vm.PC, "EXIT CODE", _vm.StopCode)
+		// ! DEBUG
+		fmt.Println(
+			"ACC", _vm.ACC, "PC", _vm.PC,
+			"EXIT CODE", _vm.StopCode, "EXEC COUNT", _vm.CountExec)
+
+		// ! DEBUG
 		_vm.MemoryDump(0x200)
 
 		os.Exit(0)

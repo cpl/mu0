@@ -31,20 +31,22 @@ import (
 	"log"
 	"time"
 
+	"github.com/thee-engineer/mu0/builtin"
 	"github.com/thee-engineer/mu0/module"
-	"github.com/thee-engineer/mu0/mu0"
 )
 
-// VM attempts to simulate the components found on the UoM MU0 boards
+// VM attempts to simulate the components found on the UoM builtin boards
 type VM struct {
 	isRunning  bool // State of the VM (running)
 	isSleeping bool // State of the VM (sleeping)
 	isInBreak  bool // State of the VM (break, wait for input)
 
-	ACC      mu0.Word         // Accumulator (main register)
-	PC       mu0.Word         // Program Counter
-	Memory   [0xFFFF]mu0.Word // Physical memory space
-	StopCode mu0.Word         // Exit code / Stop code
+	CountExec int // Count number of execute instructions
+
+	ACC      builtin.Word         // Accumulator (main register)
+	PC       builtin.Word         // Program Counter
+	Memory   [0xFFFF]builtin.Word // Physical memory space
+	StopCode builtin.Word         // Exit code / Stop code
 
 	modules []module.Module // List of peripheral devices
 }
@@ -74,7 +76,7 @@ func (v *VM) HandleModules() {
 // Load a compiled program into memory
 func (v *VM) Load(data []byte, start int) {
 	for index := start; index < len(data) && index/2 < cap(v.Memory); index += 2 {
-		v.Memory[index/2] = mu0.Word(data[index])<<8 | mu0.Word(data[index+1])
+		v.Memory[index/2] = builtin.Word(data[index])<<8 | builtin.Word(data[index+1])
 	}
 }
 
@@ -89,7 +91,7 @@ func (v *VM) LoadFile(filePath string) {
 }
 
 // Stop VM execution
-func (v *VM) Stop(code mu0.Word) {
+func (v *VM) Stop(code builtin.Word) {
 	v.StopCode = code
 	v.isRunning = false
 }
@@ -112,9 +114,9 @@ func (v *VM) AddModule(m module.Module) error {
 func (v *VM) Run() {
 	v.isRunning = true
 
-	var instruction mu0.Word // Current instruction
-	var opc mu0.Word         // Operation code
-	var arg mu0.Word         // Operation arg
+	var instruction builtin.Word // Current instruction
+	var opc builtin.Word         // Operation code
+	var arg builtin.Word         // Operation arg
 
 	// Start module handler thread
 	go v.HandleModules()
@@ -127,43 +129,43 @@ func (v *VM) Run() {
 			return
 		}
 
-		instruction = v.Memory[v.PC]    // Load instruction from memory (PC)
-		opc = instruction & mu0.OpcMask // Extract operation code
-		arg = instruction & mu0.ArgMask // Extract operation arg
+		instruction = v.Memory[v.PC]        // Load instruction from memory (PC)
+		opc = instruction & builtin.OpcMask // Extract operation code
+		arg = instruction & builtin.ArgMask // Extract operation arg
 
 		v.PC++ // Increment PC
 
 		// Check which instruction to execute and how
 		switch opc {
-		case mu0.OpLDA:
+		case builtin.OpLDA:
 			v.ACC = v.Memory[arg]
 			break
-		case mu0.OpSTA:
+		case builtin.OpSTA:
 			v.Memory[arg] = v.ACC
 			break
-		case mu0.OpADD:
+		case builtin.OpADD:
 			v.ACC += v.Memory[arg]
 			break
-		case mu0.OpSUB:
+		case builtin.OpSUB:
 			v.ACC -= v.Memory[arg]
 			break
-		case mu0.OpJMP:
+		case builtin.OpJMP:
 			v.PC = arg
 			break
-		case mu0.OpJGE:
+		case builtin.OpJGE:
 			if v.ACC >= 0 {
 				v.PC = arg
 			}
 			break
-		case mu0.OpJNE:
+		case builtin.OpJNE:
 			if v.ACC != 0 {
 				v.PC = arg
 			}
 			break
-		case mu0.OpSTP:
+		case builtin.OpSTP:
 			v.Stop(arg)
 			break
-		case mu0.OpSLP:
+		case builtin.OpSLP:
 			// Convert argument word to duration string then duration
 			d, err := time.ParseDuration(fmt.Sprintf("%dms", arg))
 			if err != nil {
@@ -179,6 +181,8 @@ func (v *VM) Run() {
 		default:
 			log.Fatalf("%04x %04x\n", opc, arg)
 		}
+
+		v.CountExec++ // Increment execute instructions
 	}
 }
 

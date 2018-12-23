@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/thee-engineer/mu0/mu0"
+	"github.com/thee-engineer/mu0/builtin"
 )
 
 func eatComment(idx *int, stream []byte) {
@@ -54,7 +54,7 @@ func eatTokenPart(idx *int, stream []byte) string {
 	return str
 }
 
-func parseArg(tkn *token, tree []*token) mu0.Word {
+func parseArg(tkn *token, tree []*token) builtin.Word {
 	// Labels and constants
 	if addr, ok := labels[tkn.arg]; ok {
 		// Expand labels to constants
@@ -63,14 +63,14 @@ func parseArg(tkn *token, tree []*token) mu0.Word {
 		}
 
 		// Expand labels to addresses
-		return mu0.Word(addr)
+		return builtin.Word(addr)
 	}
 
 	// Parse values
 	return valueToWord(tkn.arg)
 }
 
-func valueToWord(val string) mu0.Word {
+func valueToWord(val string) builtin.Word {
 	var valInt int
 
 	if strings.HasPrefix(val, "0B") {
@@ -79,21 +79,21 @@ func valueToWord(val string) mu0.Word {
 		if err != nil {
 			log.Fatalln("failed to parse value", val)
 		}
-		return mu0.Word(valInt)
+		return builtin.Word(valInt)
 	} else if strings.HasPrefix(val, "&") {
 		// Parse hex
 		_, err := fmt.Sscanf(val, "&%X", &valInt)
 		if err != nil {
 			log.Fatalln("failed to parse value", val)
 		}
-		return mu0.Word(valInt)
+		return builtin.Word(valInt)
 	} else if strings.HasPrefix(val, "0X") {
 		// Parse hex alternative
 		_, err := fmt.Sscanf(val, "0X%X", &valInt)
 		if err != nil {
 			log.Fatalln("failed to parse value", val)
 		}
-		return mu0.Word(valInt)
+		return builtin.Word(valInt)
 	}
 
 	// Parse decimal
@@ -101,5 +101,5 @@ func valueToWord(val string) mu0.Word {
 	if err != nil {
 		log.Fatalln("failed to parse value", val)
 	}
-	return mu0.Word(valInt)
+	return builtin.Word(valInt)
 }

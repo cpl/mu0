@@ -3,46 +3,47 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/thee-engineer/mu0/mu0"
+	"github.com/thee-engineer/mu0/builtin"
 )
 
-func decompileInstruction(w mu0.Word) string {
+// DecompileIns takes a word and returns the string representation of the ins
+func DecompileIns(w builtin.Word) string {
 	var ins string
 
-	switch w & mu0.OpcMask {
-	case mu0.OpLDA:
+	switch w & builtin.OpcMask {
+	case builtin.OpLDA:
 		ins = "LDA"
 		break
-	case mu0.OpSTA:
+	case builtin.OpSTA:
 		ins = "STA"
 		break
-	case mu0.OpADD:
+	case builtin.OpADD:
 		ins = "ADD"
 		break
-	case mu0.OpSUB:
+	case builtin.OpSUB:
 		ins = "SUB"
 		break
-	case mu0.OpJMP:
+	case builtin.OpJMP:
 		ins = "JMP"
 		break
-	case mu0.OpJGE:
+	case builtin.OpJGE:
 		ins = "JGE"
 		break
-	case mu0.OpJNE:
+	case builtin.OpJNE:
 		ins = "JNE"
 		break
-	case mu0.OpBRK:
+	case builtin.OpBRK:
 		ins = "BRK"
 		break
-	case mu0.OpSTP:
+	case builtin.OpSTP:
 		ins = "STP"
 		break
-	case mu0.OpSLP:
+	case builtin.OpSLP:
 		ins = "SLP"
 		break
 	default:
 		ins = "UNDEFINED"
 	}
 
-	return fmt.Sprintf("%s %X", ins, w&mu0.ArgMask)
+	return fmt.Sprintf("%s %X", ins, w&builtin.ArgMask)
 }

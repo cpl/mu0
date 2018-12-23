@@ -25,18 +25,18 @@ SOFTWARE.
 package module
 
 import (
-	"github.com/thee-engineer/mu0/mu0"
+	"github.com/thee-engineer/mu0/builtin"
 )
 
 // Module contains the functions needed for the VM to exec/handle external dev
 type Module interface {
-	Handle(mm *[0xFFFF]mu0.Word)
+	Handle(mm *[0xFFFF]builtin.Word)
 	IsBusy() bool
 }
 
 type module struct {
-	locked          bool       // Busy status
-	deviceRegisters []mu0.Word // Ports in memory
+	locked          bool           // Busy status
+	deviceRegisters []builtin.Word // Ports in memory
 }
 
 func (m module) IsBusy() bool {

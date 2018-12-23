@@ -29,20 +29,20 @@ import (
 	"os"
 	"time"
 
-	"github.com/thee-engineer/mu0/mu0"
+	"github.com/thee-engineer/mu0/builtin"
 )
 
 // Compile ...
-func Compile(inFile, outFile string) []mu0.Word {
+func Compile(inFile, outFile string) []builtin.Word {
 	log.Printf("Compile: %s -> %s\n", inFile, outFile)
 	t := time.Now()
 
 	// Lexical analysis of source code
 	tree := lex(inFile)
 
-	// Compiled binary for MU0
-	var binary []mu0.Word
-	var instruction mu0.Word
+	// Compiled binary for builtin
+	var binary []builtin.Word
+	var instruction builtin.Word
 
 	// Iterate lexical tree
 	for _, tkn := range tree {
@@ -55,7 +55,7 @@ func Compile(inFile, outFile string) []mu0.Word {
 		if tkn.t == tokenTypeDEF {
 			// If link to label, else word define
 			if addr, ok := labels[tkn.arg]; ok {
-				instruction = mu0.Word(addr)
+				instruction = builtin.Word(addr)
 			} else {
 				instruction = parseArg(tkn, tree)
 			}
