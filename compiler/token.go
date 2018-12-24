@@ -24,6 +24,8 @@ var tokenTypeToOPC = map[tokenType]builtin.Word{
 	tokenTypeBRK: builtin.OpBRK,
 	tokenTypeSLP: builtin.OpSLP,
 	tokenTypeSTP: builtin.OpSTP,
+	tokenTypeJML: builtin.OpJML,
+	tokenTypeRET: builtin.OpRET,
 }
 
 const (
@@ -35,6 +37,8 @@ const (
 	tokenTypeJMP          tokenType = 15
 	tokenTypeJGE          tokenType = 16
 	tokenTypeJNE          tokenType = 17
+	tokenTypeJML          tokenType = 18
+	tokenTypeRET          tokenType = 19
 
 	_tokenTypeCDirective tokenType = 100
 	tokenTypeEQU         tokenType = 101
@@ -49,18 +53,22 @@ const (
 
 var tokenTypeMap = map[string]tokenType{
 	// Instructions
-	"LDA":  tokenTypeLDA,
-	"STA":  tokenTypeSTA,
-	"ADD":  tokenTypeADD,
-	"SUB":  tokenTypeSUB,
-	"JMP":  tokenTypeJMP,
-	"B":    tokenTypeJMP,
-	"JGE":  tokenTypeJGE,
-	"BGE":  tokenTypeJGE,
-	"JNE":  tokenTypeJNE,
-	"BNE":  tokenTypeJNE,
-	"STP":  tokenTypeSTP,
-	"STOP": tokenTypeSTP,
+	"LDA":    tokenTypeLDA,
+	"STA":    tokenTypeSTA,
+	"ADD":    tokenTypeADD,
+	"SUB":    tokenTypeSUB,
+	"JMP":    tokenTypeJMP,
+	"B":      tokenTypeJMP,
+	"JGE":    tokenTypeJGE,
+	"BGE":    tokenTypeJGE,
+	"JNE":    tokenTypeJNE,
+	"BNE":    tokenTypeJNE,
+	"STP":    tokenTypeSTP,
+	"STOP":   tokenTypeSTP,
+	"JML":    tokenTypeJML,
+	"BL":     tokenTypeJML,
+	"RET":    tokenTypeRET,
+	"RETURN": tokenTypeRET,
 
 	// Compiler directives
 	"DEF":     tokenTypeDEF,

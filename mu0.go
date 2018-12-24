@@ -28,16 +28,24 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/thee-engineer/mu0/builtin"
 	"github.com/thee-engineer/mu0/compiler"
 	"github.com/thee-engineer/mu0/module"
-	"github.com/thee-engineer/mu0/mu0"
 	"github.com/thee-engineer/mu0/vm"
 )
 
 const usage = "mu0 <run <source.o> | build <source.s> [source.o]>"
 
+// Version of the current software
+const Version = "v0.1"
+
 func main() {
 	if len(os.Args) < 3 {
+		if os.Args[1] == "-v" {
+			fmt.Println(Version)
+			os.Exit(0)
+		}
+
 		fmt.Println(usage)
 		os.Exit(1)
 	}
@@ -55,14 +63,14 @@ func main() {
 		_vm := vm.New()
 
 		// ! DEBUG
-		_vm.AddModule(module.NewDummy([]mu0.Word{0x100, 0x102, 0x104}))
+		_vm.AddModule(module.NewDummy([]builtin.Word{0x100, 0x102, 0x104}))
 
 		_vm.LoadFile(os.Args[2])
 		_vm.Run()
 
 		// ! DEBUG
 		fmt.Println(
-			"ACC", _vm.ACC, "PC", _vm.PC,
+			"ACC", _vm.ACC, "PC", _vm.PC, "LR", _vm.LR,
 			"EXIT CODE", _vm.StopCode, "EXEC COUNT", _vm.CountExec)
 
 		// ! DEBUG

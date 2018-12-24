@@ -44,14 +44,20 @@ const (
 )
 
 const (
-	OpLDA Word = ((0 << OpcShift) & OpcMask) // 0x0000 | LDA v
-	OpSTA Word = ((1 << OpcShift) & OpcMask) // 0x1000 | STA v
-	OpADD Word = ((2 << OpcShift) & OpcMask) // 0x2000 | ADD v
-	OpSUB Word = ((3 << OpcShift) & OpcMask) // 0x3000 | SUB v
-	OpJMP Word = ((4 << OpcShift) & OpcMask) // 0x4000 | JMP v
-	OpJGE Word = ((5 << OpcShift) & OpcMask) // 0x5000 | JGE v
-	OpJNE Word = ((6 << OpcShift) & OpcMask) // 0x6000 | JNE v
-	OpSTP Word = ((7 << OpcShift) & OpcMask) // 0x7000 | STP
-	OpBRK Word = ((8 << OpcShift) & OpcMask) // 0x8000 | BRK
-	OpSLP Word = ((9 << OpcShift) & OpcMask) // 0x9000 | SLP ms
+	OpLDA     Word = ((0 << OpcShift) & OpcMask)  // 0x0000 | LDA v
+	OpSTA     Word = ((1 << OpcShift) & OpcMask)  // 0x1000 | STA v
+	OpADD     Word = ((2 << OpcShift) & OpcMask)  // 0x2000 | ADD v
+	OpSUB     Word = ((3 << OpcShift) & OpcMask)  // 0x3000 | SUB v
+	OpJMP     Word = ((4 << OpcShift) & OpcMask)  // 0x4000 | JMP v
+	OpJGE     Word = ((5 << OpcShift) & OpcMask)  // 0x5000 | JGE v
+	OpJNE     Word = ((6 << OpcShift) & OpcMask)  // 0x6000 | JNE v
+	OpSTP     Word = ((7 << OpcShift) & OpcMask)  // 0x7000 | STP
+	OpBRK     Word = ((8 << OpcShift) & OpcMask)  // 0x8000 | BRK
+	OpSLP     Word = ((9 << OpcShift) & OpcMask)  // 0x9000 | SLP ms
+	OpJML     Word = ((10 << OpcShift) & OpcMask) // 0xA000 | JML v
+	OpRET     Word = ((11 << OpcShift) & OpcMask) // 0xB000 | RET
+	OpUNDEF12 Word = ((12 << OpcShift) & OpcMask) // 0xC000 |
+	OpUNDEF13 Word = ((13 << OpcShift) & OpcMask) // 0xD000 |
+	OpUNDEF14 Word = ((14 << OpcShift) & OpcMask) // 0xE000 |
+	OpUNDEF15 Word = ((15 << OpcShift) & OpcMask) // 0xF000 |
 )

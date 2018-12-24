@@ -1,32 +1,30 @@
-start	LDA	nil
+start	LDA	nil	; 0
 
-	SLP	3000
+	ADD	two	; 2
+	ADD	one	; 3
 
-	ADD	one
-	ADD	one
-	ADD	two
-	SUB	one
-	SUB	nil
-	ADD	five
+	SUB	nil	; 3
+	ADD	nil	; 3
 
-	JMP	skip
-	SUB	five
-	SUB	one
-	STOP	3
-skip
+	JMP	skip	; -
+	ADD	one	; -
+skip			; 3
+
+	SUB	one	; 2
+
+	JML	addtwo	; 4
+
+end	STOP	3	; 4
 
 
-	LDA	two
-	JNE	end
+nil	DEFW	&0
+one	DEFW	0x1
+two	DEFW	0b10
 
-	ADD	one
-	STOP	1
 
-end	STOP	2
+addtwo
+	ADD	one	; +1
+	ADD	two	; +2
+	SUB	one	; -1
 
-nil	DEFW	0
-one	DEFW	1
-two	DEFW	2
-
-	DEFW	5
-five	EQU	11
+	RET	0

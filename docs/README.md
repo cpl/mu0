@@ -50,22 +50,10 @@ has extra instructions and compiler directives defined, and some aliases for ARM
 | 0111 | STP       | STP S    | Stop the program from running. `S` will be the exit code  |
 | 1000 | BRK       | BRK      | Pause the program execution, action must be taken         |
 | 1001 | SLP       | SLP S    | VM level implementation of `sleep` to avoid idle-spin, sleep S ms     |
+| 1010 | JML       | JML S    | Set the `PC` to the value of `S` but save the `PC+1` to `LR` |
+| 1011 | RET       | RET S    | Set the `PC` to the value of `LR` and set the `LR` to `S` |
 
 ### University of Manchester
 
 The boards provided by the University of Manchester (which inspired me to make this program) look like this:
 ![UoM Board](./uomboard.png)
-
-## Specifications
-
-## TODO
-
-- [ ] Add SP, LR to the MU0 VM (with instruction set) (with run/compile flag optional)
-- [ ] Add register operations to the compiler (with run/compile flag optional)
-- [x] Implement SLP operation
-- [ ] Implement BRK operation
-- [x] Implement module interface and handler
-- [ ] Implement peripherals for the VM (keypad, LCD display, etc.)
-- [ ] Implement INCLUDE compiler directive
-- [ ] Implement interactive VM mode
-- [ ] Implement flags for compiler and VM

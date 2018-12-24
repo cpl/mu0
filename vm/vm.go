@@ -45,6 +45,7 @@ type VM struct {
 
 	ACC      builtin.Word         // Accumulator (main register)
 	PC       builtin.Word         // Program Counter
+	LR       builtin.Word         // Link Register
 	Memory   [0xFFFF]builtin.Word // Physical memory space
 	StopCode builtin.Word         // Exit code / Stop code
 
@@ -164,6 +165,14 @@ func (v *VM) Run() {
 			break
 		case builtin.OpSTP:
 			v.Stop(arg)
+			break
+		case builtin.OpJML:
+			v.LR = v.PC
+			v.PC = arg
+			break
+		case builtin.OpRET:
+			v.PC = v.LR
+			v.LR = arg
 			break
 		case builtin.OpSLP:
 			// Convert argument word to duration string then duration
