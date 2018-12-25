@@ -174,6 +174,9 @@ func (v *VM) Run() {
 			v.PC = v.LR
 			v.LR = arg
 			break
+		case builtin.OpSWP:
+			v.ACC, v.Memory[arg] = v.Memory[arg], v.ACC
+			break
 		case builtin.OpSLP:
 			// Convert argument word to duration string then duration
 			d, err := time.ParseDuration(fmt.Sprintf("%dms", arg))

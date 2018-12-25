@@ -26,6 +26,7 @@ var tokenTypeToOPC = map[tokenType]builtin.Word{
 	tokenTypeSTP: builtin.OpSTP,
 	tokenTypeJML: builtin.OpJML,
 	tokenTypeRET: builtin.OpRET,
+	tokenTypeSWP: builtin.OpSWP,
 }
 
 const (
@@ -39,6 +40,7 @@ const (
 	tokenTypeJNE          tokenType = 17
 	tokenTypeJML          tokenType = 18
 	tokenTypeRET          tokenType = 19
+	tokenTypeSWP          tokenType = 20
 
 	_tokenTypeCDirective tokenType = 100
 	tokenTypeEQU         tokenType = 101
@@ -69,6 +71,8 @@ var tokenTypeMap = map[string]tokenType{
 	"BL":     tokenTypeJML,
 	"RET":    tokenTypeRET,
 	"RETURN": tokenTypeRET,
+	"SWP":    tokenTypeSWP,
+	"SWAP":   tokenTypeSWP,
 
 	// Compiler directives
 	"DEF":     tokenTypeDEF,

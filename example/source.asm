@@ -1,25 +1,28 @@
 start	LDA	nil	; 0
 
-	ADD	two	; 2
-	ADD	one	; 3
+	SWAP	oneswap	; 1
 
-	SUB	nil	; 3
-	ADD	nil	; 3
+	ADD	two	; 3
+	ADD	one	; 4
+
+	SUB	nil	; 4
+	ADD	nil	; 4
 
 	JMP	skip	; -
 	ADD	one	; -
-skip			; 3
+skip			; 4
 
-	SUB	one	; 2
+	SUB	one	; 3
 
-	JML	addtwo	; 4
+	JML	addtwo	; 5
 
-end	STOP	3	; 4
+end	STOP	3	; 5
 
 
 nil	DEFW	&0
 one	DEFW	0x1
 two	DEFW	0b10
+oneswap	DEFW	1
 
 
 addtwo
